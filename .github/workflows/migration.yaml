@@ -1,0 +1,33 @@
+name: migration test
+on:
+  push:
+    paths:
+      - 'api/**'
+    branches:
+      - develop
+      - staging
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Specify Changed Files
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            migrations:
+              - 'api/src/migrations/**'
+
+      - name: Migration Test
+        if: steps.changes.outputs.migrations == 'true'
+        run: |
+          echo "run migration"
